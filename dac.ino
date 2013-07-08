@@ -108,7 +108,7 @@ void dac_wavegen(uint8_t kind, uint8_t samples, uint8_t size, uint16_t data[]) {
 
 // Play tone until millis mark
 void dac_play(long mark) {
-  dac_playing = true;
+  if (cfg_get_sidetone() || !tx_enabled()) dac_playing = true;
   dac_timer = mark;
 }
 
@@ -318,3 +318,32 @@ void cfg_volume(uint8_t button) {
   lcd.print(LCD_CLEAR_8);
   if (changed) cfg_set_volume(cfg_volume_level);
 }
+
+
+uint8_t cfg_sidetone_type;
+const char *cfg_sidetone_text[] = {
+  "OFF",
+  "ON"
+};
+
+uint8_t cfg_get_sidetone() {
+  return cfg_sidetone_type;
+}
+
+void cfg_set_sidetone(uint8_t sidetone) {
+  cfg_sidetone_type = sidetone;
+}
+
+void cfg_sidetone(uint8_t button) {
+  if ((button & BUTTON_UP) || (button & BUTTON_DOWN)) {
+    cfg_sidetone_type++;
+    if (cfg_sidetone_type > 1) cfg_sidetone_type = 0;
+  }
+  
+  lcd.setCursor( 0, 1 );
+  lcd.print("TX SIDETONE: ");
+  lcd.print(cfg_sidetone_text[cfg_sidetone_type]);
+  lcd.print(LCD_CLEAR_8);
+}
+
+

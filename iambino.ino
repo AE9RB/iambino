@@ -37,31 +37,6 @@ void loop() {
   long mark;
   uint8_t button, mcode;
   
-  mark = micros();
-  switch(state) {
-  default: // normal & settings
-    mcode = key_loop(mark);
-    break;
-  case 2: // message play
-    mcode = message_play(mark);
-    if (mcode == 1) {
-      lcd_show_main();
-      mcode = 0;
-      state = 0;
-    }
-    break;
-  case 3: // message record
-    mcode = message_record(key_loop(mark));
-    break;
-  case 4:
-    mcode = 0;
-    break;
-  }
-  dac_loop(mark);
-  tx_loop(mark);
-  if (mcode == 1) lcd_write(1);
-  else if (mcode) lcd_write(morse_char_for(mcode));
-  
   button_pot();
   if (prev_speed != cfg_get_speed()) {
     prev_speed = cfg_get_speed();
@@ -81,6 +56,28 @@ void loop() {
     }
   }
   
+  mark = micros();
+  switch(state) {
+  default: // normal & settings
+    mcode = key_loop(mark);
+    break;
+  case 2: // message play
+    mcode = message_play(mark);
+    if (mcode == 1) {
+      lcd_show_main();
+      mcode = 0;
+      state = 0;
+    }
+    break;
+  case 3: // message record
+    mcode = message_record(key_loop(mark));
+    break;
+  }
+  dac_loop(mark);
+  tx_loop(mark);
+  if (mcode == 1) lcd_write(1);
+  else if (mcode) lcd_write(morse_char_for(mcode));
+  
   button = button_read(mark);
   switch(state) {
   case 0: // normal
@@ -93,8 +90,9 @@ void loop() {
       }
       if (button & BUTTON_REPEAT) {
         message_load(button);
-        message_clear();
+        lcd_clear();
         lcd_show_record();
+        tx_disable();
         state = 3;
       }
     }
@@ -113,7 +111,7 @@ void loop() {
     break;
   case 2: // message play
     lcd_loop();
-    if (button & BUTTON_RELEASE) {
+    if (button & BUTTON_RELEASE || key_read()) {
       message_stop_play();
     }
     break;
@@ -123,6 +121,7 @@ void loop() {
       if (button & BUTTON_RELEASE) {
         // cancel record
         lcd_show_main();
+        tx_enable();
         state = 0;
       }
     }
@@ -134,6 +133,7 @@ void loop() {
   case 4: // stop record
     if (button & BUTTON_RELEASE) {
       lcd_show_main();
+      tx_enable();
       state = 0;
     }
     break;
@@ -142,15 +142,28 @@ void loop() {
 }
 
 long tx_timer;
+bool tx_flag = true;
 
 void tx_send(long mark) {
-  digitalWrite(TX_PIN, HIGH);
+  if (tx_flag) digitalWrite(TX_PIN, HIGH);
   tx_timer = mark;
 }
 
 void tx_loop(long mark) {
   if(tx_timer - mark < 0) digitalWrite(TX_PIN, LOW);
-} 
+}
+
+bool tx_enabled() {
+  return tx_flag;
+}
+
+void tx_enable() {
+  tx_flag = true;
+}
+
+void tx_disable() {
+  tx_flag = false;
+}
 
 
 void settings_reset() {
@@ -166,6 +179,7 @@ void settings_reset() {
   cfg_set_weight(0.50);
   cfg_set_spacing(CFG_SPACING_EL);
   cfg_set_paddle(CFG_PADDLE_NORMAL);
+  cfg_set_sidetone(1);
 }
 
 typedef void(*cfg_function)(uint8_t);
@@ -181,6 +195,7 @@ cfg_function cfg_functions[] = {
   cfg_lag,
   cfg_tone,
   cfg_volume,
+  cfg_sidetone,
   cfg_backlight
 };
 

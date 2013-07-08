@@ -62,11 +62,15 @@ uint8_t lcd_buffer[16], lcd_pos = 0, lcd_update_pos = 16;
 
 void lcd_setup() {
   lcd.begin( 16, 2 );
-  // lcd_show_main();
-  for (int i=0; i<16; i++) lcd_buffer[i] = ' ';
+  lcd_clear();
   lcd_create_char(0, lcd_box);
   lcd_create_char(1, lcd_left_arrow);
   lcd_create_char(2, lcd_right_arrow);
+}
+
+void lcd_clear() {
+  for (int i=0; i<16; i++) lcd_buffer[i] = ' ';
+  lcd_update_pos = 17;
 }
 
 void lcd_show_main() {
@@ -77,13 +81,17 @@ void lcd_show_main() {
 
 void lcd_show_play() {
   lcd.setCursor( 0, 0 );
-  lcd.print( "PLAY     " );
+  lcd.print( "PLAY " );
+  lcd.print( message_get_index() );
+  lcd.print( "   " );
   lcd_append_wpm();
 }
 
 void lcd_show_record() {
   lcd.setCursor( 0, 0 );
-  lcd.print( "REC      " );
+  lcd.print( "REC " );
+  lcd.print( message_get_index() );
+  lcd.print( "    " );
   lcd_append_wpm();
 }
 

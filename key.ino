@@ -291,27 +291,36 @@ void cfg_paddle(uint8_t button) {
 }
 
 
+uint8_t key_read() {
+  uint8_t k0, k1;
+  k0 = digitalRead(KEY_0) ^ 1;
+  k1 = digitalRead(KEY_1) ^ 1;
+  if (cfg_mode_type == CFG_MODE_STRAIGHT) {
+    k0 <<= 1;
+    k1 = 0;
+  } else if (cfg_paddle_type == CFG_PADDLE_NORMAL) {
+    k1 <<= 1;
+  } else {
+    k0 <<= 1;
+  }
+  return (k0|k1);
+}
+
+
 uint8_t key_loop(long mark) {
   static uint8_t last, spacing=2, ultimatic, state=3, staged=0, mcode=0x80;
   static long read_after, start_after;
   uint8_t k0, k1, ret = 0;
   long i;
   
-  if (cfg_mode_type == CFG_MODE_STRAIGHT) {
-    k1 = digitalRead(KEY_0);
-    k0 = 1;
-  } else if (cfg_paddle_type == CFG_PADDLE_NORMAL) {
-    k0 = digitalRead(KEY_0);
-    k1 = digitalRead(KEY_1);
-  } else {
-    k1 = digitalRead(KEY_0);
-    k0 = digitalRead(KEY_1);
-  }
+  k0 = key_read();
+  k1 = k0 & 2;
+  k0 = k0 & 1;
   
   switch(state) {
   case 1: // waiting until ready for read
     if (cfg_spacing_type == CFG_SPACING_NONE)
-      if ((!k0 && last == DIT) || (!k1 && last == DAH))
+      if ((k0 && last == DIT) || (k1 && last == DAH))
         read_after = mark + KEY_DEBOUNCE_IAMBIC;
     if (read_after - mark < 0) state = 2;
     break;
@@ -366,16 +375,16 @@ uint8_t key_loop(long mark) {
   }
 
   if (cfg_mode_type == CFG_MODE_STRAIGHT || cfg_mode_type == CFG_MODE_BUG) {
-    if (!k1) {
+    if (k1) {
       i = mark + KEY_DEBOUNCE_SRAIGHT;
       if (state < 4) {
         state = 4;
-        digitalWrite(TX_PIN, HIGH);
         start_after = i;
       }
       if (state < 6) {
         read_after = i;
         dac_play(i);
+        tx_send(i);
       }
       last = DAH;
       staged = 0;
@@ -386,32 +395,34 @@ uint8_t key_loop(long mark) {
       } else {
         state = 6;
         dac_play(mark);
-        digitalWrite(TX_PIN, LOW);
+        tx_send(mark);
       }
     }
+  } else {
+    if (state > 3) state = 6;
   }
   
   if (!staged) {
     if (state > 1) {
-      if (!k0 && !k1) {
+      if (k0 && k1) {
         if (ultimatic && cfg_mode_type == CFG_MODE_ULTIMATIC) staged = last;
         else if (last == DIT) staged = DAH;
         else staged = DIT;
         ultimatic = 1;
       } else {
-        if (!k0) staged = DIT;
-        if (!k1) staged = DAH;
+        if (k0) staged = DIT;
+        if (k1) staged = DAH;
         ultimatic = 0;
       }
     }
     else if (!ultimatic || cfg_mode_type != CFG_MODE_ULTIMATIC) {
-      if (!k0 && (last == DAH || spacing > 0)) {
+      if (k0 && (last == DAH || spacing > 0)) {
         if (cfg_memory_type & CFG_MEMORY_DIT) {
           staged = DIT;
           ultimatic = 1;
         }
       }
-      if (!k1 && (last == DIT || spacing > 0)) {
+      if (k1 && (last == DIT || spacing > 0)) {
         if (cfg_memory_type & CFG_MEMORY_DAH) {
           staged = DAH;
           ultimatic = 1;

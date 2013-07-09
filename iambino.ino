@@ -211,3 +211,20 @@ void settings_loop(uint8_t button) {
   if (setting >= (int8_t)(sizeof(cfg_functions)/sizeof(cfg_function))) setting = 0;
   cfg_functions[setting](button);
 }
+
+// Transfer data from eeprom to memory or memory to eeprom.
+// Skips writes where the data has not changed.
+void eeprom_xfer(void* mem, int eeprom, size_t length, bool write) {
+  uint8_t i, j;
+  while (length--) {
+    i = EEPROM.read(eeprom);
+    if (write) {
+      j = *(uint8_t*)mem;
+      if (i!=j) EEPROM.write(eeprom, j);
+    } else {
+      *(uint8_t*)mem = i;
+    }
+    mem = (uint8_t*)mem + 1;
+    eeprom++;
+  }
+}

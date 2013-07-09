@@ -14,7 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-uint8_t message_length, message_data[111];
+struct message {
+  uint8_t length;
+  uint8_t data[111];
+} message;
 uint8_t message_index, message_pos, message_char, message_char_cnt;
 
 uint8_t cfg_message_bank;
@@ -41,51 +44,40 @@ void cfg_message(uint8_t button) {
 uint8_t message_record(uint8_t mcode) {
   uint8_t i;
   if (!mcode || mcode == 0xff) return 0;
-  if (message_pos >= sizeof(message_data)) return 0;
+  if (message_pos >= sizeof(message.data)) return 0;
   if (mcode == 0x01) {
     // delete
-    if (message_pos > 0 && message_data[message_pos-1] == 0x80) message_pos--;
+    if (message_pos > 0 && message.data[message_pos-1] == 0x80) message_pos--;
     while(message_pos > 0) {
-      if (message_data[message_pos-1] == 0x80) break;
+      if (message.data[message_pos-1] == 0x80) break;
       message_pos--;
     }
     lcd_clear();
     if (message_pos < 16) i = 0;
     else i = message_pos - 16;
     for (;i<message_pos;i++) {
-      lcd_write(morse_char_for(message_data[i]));
+      lcd_write(morse_char_for(message.data[i]));
     }
     return 0;
   }
-  if (mcode != 0x80 || (message_pos > 0 && message_data[message_pos-1] != 0x80)) {
-    message_data[message_pos] = mcode;
+  if (mcode != 0x80 || (message_pos > 0 && message.data[message_pos-1] != 0x80)) {
+    message.data[message_pos] = mcode;
     message_pos++;
     return mcode;
   }
   return 0;
 }
 
-void message_eeprom_xfer(bool write) {
-  int i, j = message_index * (sizeof(message_length) + sizeof(message_data));
-  if (write) EEPROM.write(j, message_length);
-  else message_length = EEPROM.read(j);
-  for(i=0; i < (int)sizeof(message_data); i++) {
-    j++;
-    if (write) EEPROM.write(j, message_data[i]);
-    else message_data[i] = EEPROM.read(j);
-  }
-}
-
 void message_save() {
-  if (message_pos > 0 && message_data[message_pos-1] == 0x80) {
+  if (message_pos > 0 && message.data[message_pos-1] == 0x80) {
     message_pos--;
   }
-  message_length = message_pos;
-  message_eeprom_xfer(true);
+  message.length = message_pos;
+  eeprom_xfer(&message, sizeof(message)*message_index, sizeof(message), true);
 }
 
 void message_stop_play() {
-  message_pos = message_length;
+  message_pos = message.length;
 }
 
 uint8_t message_play(long mark) {
@@ -95,9 +87,9 @@ uint8_t message_play(long mark) {
   uint8_t ret = 0;
   
   if (!message_char_cnt) {
-    if (message_pos >= message_length) return 1;
+    if (message_pos >= message.length) return 1;
     if (!message_pos) wait = mark;
-    ret = message_char = message_data[message_pos];
+    ret = message_char = message.data[message_pos];
     message_pos++;
     if (!message_char) {
        message_char_cnt = 1;
@@ -130,7 +122,7 @@ uint8_t message_play(long mark) {
       wait = i + DIT * cfg_get_speed_micros() * (2.0 - cfg_get_weight() * 2);
     } else {
       wait = mark + 2 * DIT * cfg_get_speed_micros();
-      if (message_pos >= message_length) ret = 0x80;
+      if (message_pos >= message.length) ret = 0x80;
     }
     if (!message_char_cnt) state = 0;
     break;
@@ -147,8 +139,8 @@ void message_load(uint8_t button) {
     case BUTTON_RIGHT: message_index = 4; break;
   }
   message_index += 4 * cfg_message_bank;
-  message_eeprom_xfer(false);
-  if (message_length > sizeof(message_data)) message_length = 0;
+  eeprom_xfer(&message, sizeof(message)*message_index, sizeof(message), false);
+  if (message.length > sizeof(message.data)) message.length = 0;
   message_pos = 0;
   message_char_cnt = 0;  
 }
@@ -156,5 +148,3 @@ void message_load(uint8_t button) {
 uint8_t message_get_index() {
   return message_index;
 }
-
-

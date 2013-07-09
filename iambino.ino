@@ -180,6 +180,7 @@ void settings_reset() {
   cfg_set_spacing(CFG_SPACING_EL);
   cfg_set_paddle(CFG_PADDLE_NORMAL);
   cfg_set_sidetone(1);
+  cfg_set_message(0);
 }
 
 typedef void(*cfg_function)(uint8_t);
@@ -187,6 +188,7 @@ cfg_function cfg_functions[] = {
   cfg_speed,
   cfg_speed_min,
   cfg_speed_max,
+  cfg_message,
   cfg_mode,
   cfg_memory,
   cfg_spacing,

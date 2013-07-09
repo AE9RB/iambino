@@ -17,6 +17,27 @@
 uint8_t message_length, message_data[111];
 uint8_t message_index, message_pos, message_char, message_char_cnt;
 
+uint8_t cfg_message_bank;
+
+uint8_t cfg_get_message() {
+  return cfg_message_bank;
+}
+
+void cfg_set_message(uint8_t bank) {
+  cfg_message_bank = bank;
+}
+
+void cfg_message(uint8_t button) {
+  if (button & (BUTTON_UP|BUTTON_DOWN)) {
+    cfg_message_bank = (cfg_message_bank + 1) & 1;
+  }
+  
+  lcd.setCursor( 0, 1 );
+  lcd.print("MESSAGE BANK: ");
+  lcd.print(cfg_message_bank + 1);
+  lcd.print(LCD_CLEAR_8);
+}
+
 uint8_t message_record(uint8_t mcode) {
   uint8_t i;
   if (!mcode || mcode == 0xff) return 0;
@@ -125,6 +146,7 @@ void message_load(uint8_t button) {
     case BUTTON_UP: message_index = 3; break;
     case BUTTON_RIGHT: message_index = 4; break;
   }
+  message_index += 4 * cfg_message_bank;
   message_eeprom_xfer(false);
   if (message_length > sizeof(message_data)) message_length = 0;
   message_pos = 0;
@@ -134,3 +156,5 @@ void message_load(uint8_t button) {
 uint8_t message_get_index() {
   return message_index;
 }
+
+

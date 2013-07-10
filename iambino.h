@@ -19,41 +19,18 @@
 #define CFG_VOLUME_MAX 20
 #define CFG_BACKLIGHT_MAX 10
 #define CFG_SPEED_MIN 5.0
-#define CFG_SPEED_MAX 40.0
+#define CFG_SPEED_MAX 50.0
 #define CFG_LAG_MAX 25
 #define CFG_WEIGHT_DIST 0.25
-
-// Keying modes
-#define CFG_MODE_IAMBIC 0
-#define CFG_MODE_ULTIMATIC 1
-#define CFG_MODE_BUG 2
-#define CFG_MODE_STRAIGHT 3
-
-// Keying memory
-#define CFG_MEMORY_NONE 0
-#define CFG_MEMORY_DAH 1
-#define CFG_MEMORY_DIT 2
-#define CFG_MEMORY_BOTH 3
-
-// Keying spacing
-#define CFG_SPACING_NONE 0
-#define CFG_SPACING_EL 1
-#define CFG_SPACING_CHAR 2
-#define CFG_SPACING_WORD 3
-
-// Paddle reversal
-#define CFG_PADDLE_NORMAL 0
-#define CFG_PADDLE_REVERSE 1
 
 // Morse code timings.
 #define DIT 1
 #define DAH 3
 
-// Spaces for clearing LCD. Send twice to clear a whole line.
+// Spaces for clearing LCD.
 #define LCD_CLEAR_8  "        "
 
-// Button press events. First press will have BUTTON_REPEAT clear.
-// Holding a button will generate events with BUTTON_REPEAT set.
+// Button press events.
 #define BUTTON_NONE     0
 #define BUTTON_SELECT   _BV(0)
 #define BUTTON_LEFT     _BV(1)
@@ -66,7 +43,7 @@
 // Buttons pin. Divider array on analog pin.
 #define BUTTON_APIN A2
 
-// Buttons pin. Divider array on analog pin.
+// Speed potentiometer.
 #define POT_APIN A3
 
 // Iambic key pins. 0=dot, 1=dash
@@ -86,9 +63,6 @@
 #define LCD_BACKLIGHT 5
 
 // DAC pins for direct hardware access.
-// Arduino digitalWrite() calls will lookup pins from a
-// table in program space. We avoid this lookup and the
-// stack calls by accessing hardware directly.
 // PIN11
 #define DAC_SDI_DDR  DDRB
 #define DAC_SDI_PORT PORTB
@@ -101,3 +75,14 @@
 #define DAC_SCK_DDR  DDRB
 #define DAC_SCK_PORT PORTB
 #define DAC_SCK_BIT  (5)
+
+// Share lcd object across entire app
+extern LiquidCrystal lcd;
+
+// Update the progmem macros so they don't spam warnings
+#if (((__GNUC__ * 1000) + __GNUC_MINOR__) * 1000 + __GNUC_PATCHLEVEL__) < 4006002 
+# undef PROGMEM 
+# define PROGMEM __attribute__(( section(".progmem.data") )) 
+# undef PSTR 
+# define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s);&__c[0];})) 
+#endif 

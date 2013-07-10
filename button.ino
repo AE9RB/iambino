@@ -122,12 +122,12 @@ bool button_pot() {
     cfg_set_speed(0);
   }
   
-  seg = (1 + button_pot_max - button_pot_min) / (1 + cfg_get_speed_max() - cfg_get_speed_min());
+  seg = (1 + button_pot_max - button_pot_min) / (1 + cfg.speed_max - cfg.speed_min);
   dz = seg / 4;
   pos = i - button_pot_min;
   mod = pos % seg;
-  speed = pos / seg + cfg_get_speed_min();
-  if (speed > cfg_get_speed_max()) speed = cfg_get_speed_max();
+  speed = pos / seg + cfg.speed_min;
+  if (speed > cfg.speed_max) speed = cfg.speed_max;
   
   if (cfg_get_speed()==0 || (mod > dz && seg-mod > dz && prev_speed != speed)) {
     cfg_set_speed(speed);

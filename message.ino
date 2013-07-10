@@ -20,24 +20,19 @@ struct message {
 } message;
 uint8_t message_index, message_pos, message_char, message_char_cnt;
 
-uint8_t cfg_message_bank;
-
-uint8_t cfg_get_message() {
-  return cfg_message_bank;
-}
-
-void cfg_set_message(uint8_t bank) {
-  cfg_message_bank = bank;
-}
-
 void cfg_message(uint8_t button) {
+  if (button == BUTTON_NONE) {
+    cfg.message = 0;
+    return;
+  }
+  
   if (button & (BUTTON_UP|BUTTON_DOWN)) {
-    cfg_message_bank = (cfg_message_bank + 1) & 1;
+    cfg.message = (cfg.message + 1) & 1;
   }
   
   lcd.setCursor( 0, 1 );
-  lcd.print("MESSAGE BANK: ");
-  lcd.print(cfg_message_bank + 1);
+  lcd.print(F("MESSAGE BANK: "));
+  lcd.print(cfg.message + 1);
   lcd.print(LCD_CLEAR_8);
 }
 
@@ -116,10 +111,10 @@ uint8_t message_play(long mark) {
     if (message_char_cnt) {
       if (message_char & 0x01) i = mark + DAH * cfg_get_speed_micros();
       else i = mark + DIT * cfg_get_speed_micros();
-      i += DIT * cfg_get_speed_micros() * (cfg_get_weight() * 2 - 1);
+      i += DIT * cfg_get_speed_micros() * (cfg.weight * 2 - 1);
       dac_play(i);
-      tx_send(i + (long)cfg_get_lag() * 1000);
-      wait = i + DIT * cfg_get_speed_micros() * (2.0 - cfg_get_weight() * 2);
+      tx_send(i + (long)cfg.lag * 1000);
+      wait = i + DIT * cfg_get_speed_micros() * (2.0 - cfg.weight * 2);
     } else {
       wait = mark + 2 * DIT * cfg_get_speed_micros();
       if (message_pos >= message.length) ret = 0x80;
@@ -138,7 +133,7 @@ void message_load(uint8_t button) {
     case BUTTON_UP: message_index = 3; break;
     case BUTTON_RIGHT: message_index = 4; break;
   }
-  message_index += 4 * cfg_message_bank;
+  message_index += 4 * cfg.message;
   eeprom_xfer(&message, sizeof(message)*message_index, sizeof(message), false);
   if (message.length > sizeof(message.data)) message.length = 0;
   message_pos = 0;

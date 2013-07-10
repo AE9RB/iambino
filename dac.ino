@@ -61,7 +61,6 @@ bool dac_playing = false;
 bool dac_changed = false;
 long dac_timer;
 float dac_volume;
-float dac_tone;
 uint16_t dac_wav_atk[180];
 uint16_t dac_wav_sus[80];
 uint16_t dac_wav_rel[80];
@@ -108,7 +107,7 @@ void dac_wavegen(uint8_t kind, uint8_t samples, uint8_t size, uint16_t data[]) {
 
 // Play tone until millis mark
 void dac_play(long mark) {
-  if (cfg_get_sidetone() || !tx_enabled()) dac_playing = true;
+  if (cfg.sidetone || !tx_enabled()) dac_playing = true;
   dac_timer = mark;
 }
 
@@ -126,7 +125,7 @@ void dac_loop(long mark) {
     //   dac_wav_sus = max(sine_samples)
     //   dac_wav_rel = max(sine_samples*release_size)
     sine_samples = 12;
-    while (sine_samples * dac_tone < 16000) sine_samples += 4;
+    while (sine_samples * cfg.tone < 16000) sine_samples += 4;
     attack_size = 60 / sine_samples + 2;
     release_size = attack_size / 2;
     dac_wavegen(0, sine_samples, attack_size, dac_wav_atk);
@@ -135,7 +134,7 @@ void dac_loop(long mark) {
     dac_wav_atk_len = sine_samples * attack_size;
     dac_wav_sus_len = sine_samples;
     dac_wav_rel_len = sine_samples * release_size;
-    OCR1A =  F_CPU / (dac_tone * sine_samples);
+    OCR1A =  F_CPU / (cfg.tone * sine_samples);
     dac_changed = false;
     dac_play(mark + 175000);
   }
@@ -241,56 +240,47 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 
-float cfg_get_tone() {
-  return dac_tone;
-}
-
-void cfg_set_tone(float newtone) {
-  dac_tone = newtone;
+void cfg_set_tone(float tone) {
+  cfg.tone = tone;
   dac_changed = true;
   dac_playing = false;
 }
 
 void cfg_tone(uint8_t button) {
   int i;
+  if (button == BUTTON_NONE) {
+    cfg_set_tone(dac_tones[18]);
+    return;
+  }
+  
   button_fast(true);
-
   if (button & BUTTON_UP) {
     for(i=0;i<(int)(sizeof(dac_tones)/sizeof(float));i++) {
-      if (dac_tones[i] > dac_tone) {
-        dac_tone = dac_tones[i];
-        cfg_set_tone(dac_tone);
+      if (dac_tones[i] > cfg.tone) {
+        cfg_set_tone(dac_tones[i]);
         break;
       }
     }
   }
-
   if (button & BUTTON_DOWN) {
     for(i=sizeof(dac_tones)/sizeof(float)-1;i>=0;i--) {
-      if (dac_tones[i] < dac_tone) {
-        dac_tone = dac_tones[i];
-        cfg_set_tone(dac_tone);
+      if (dac_tones[i] < cfg.tone) {
+        cfg_set_tone(dac_tones[i]);
         break;
       }
     }
   }
 
   lcd.setCursor( 0, 1 );
-  lcd.print("TONE: ");
-  lcd.print(dac_tone, 1);
-  lcd.print(" Hz");
-  lcd.print("  ");
+  lcd.print(F("TONE: "));
+  lcd.print(cfg.tone, 1);
+  lcd.print(F(" Hz"));
+  lcd.print(LCD_CLEAR_8);
 }
 
-
-uint8_t cfg_volume_level;
-
-uint8_t cfg_get_volume() {
-  return cfg_volume_level;
-}
 
 void cfg_set_volume(uint8_t volume) {
-  cfg_volume_level = volume;
+  cfg.volume = volume;
   dac_changed = true;
   dac_playing = false;
   dac_volume = 1 - log10(((float)CFG_VOLUME_MAX / 9 + CFG_VOLUME_MAX - volume) * 9 / CFG_VOLUME_MAX);
@@ -298,51 +288,52 @@ void cfg_set_volume(uint8_t volume) {
 
 void cfg_volume(uint8_t button) {
   bool changed = false;
+  if (button == BUTTON_NONE) {
+    cfg_set_volume(5);
+    return;
+  }
+  
   button_fast(true);
   if (button & BUTTON_UP) {
-    if (cfg_volume_level < CFG_VOLUME_MAX) {
-      cfg_volume_level++;
+    if (cfg.volume < CFG_VOLUME_MAX) {
+      cfg.volume++;
       changed = true;
     }
   }
   if (button & BUTTON_DOWN) {
-    if (cfg_volume_level > 0) {
-      cfg_volume_level--;
+    if (cfg.volume > 0) {
+      cfg.volume--;
       changed = true;
     }
   }
   
   lcd.setCursor( 0, 1 );
-  lcd.print("VOLUME: ");
-  lcd.print(cfg_volume_level);
+  lcd.print(F("VOLUME: "));
+  lcd.print(cfg.volume);
   lcd.print(LCD_CLEAR_8);
-  if (changed) cfg_set_volume(cfg_volume_level);
+  if (changed) cfg_set_volume(cfg.volume);
 }
 
 
-uint8_t cfg_sidetone_type;
 const char *cfg_sidetone_text[] = {
   "OFF",
   "ON"
 };
 
-uint8_t cfg_get_sidetone() {
-  return cfg_sidetone_type;
-}
-
-void cfg_set_sidetone(uint8_t sidetone) {
-  cfg_sidetone_type = sidetone;
-}
-
 void cfg_sidetone(uint8_t button) {
+  if (button == BUTTON_NONE) {
+    cfg.sidetone = 1;
+    return;
+  }
+  
   if ((button & BUTTON_UP) || (button & BUTTON_DOWN)) {
-    cfg_sidetone_type++;
-    if (cfg_sidetone_type > 1) cfg_sidetone_type = 0;
+    cfg.sidetone++;
+    if (cfg.sidetone > 1) cfg.sidetone = 0;
   }
   
   lcd.setCursor( 0, 1 );
-  lcd.print("TX SIDETONE: ");
-  lcd.print(cfg_sidetone_text[cfg_sidetone_type]);
+  lcd.print(F("TX SIDETONE: "));
+  lcd.print(cfg_sidetone_text[cfg.sidetone]);
   lcd.print(LCD_CLEAR_8);
 }
 

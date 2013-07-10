@@ -74,24 +74,24 @@ void lcd_clear() {
 }
 
 void lcd_show_main() {
-  lcd.setCursor( 0, 0 );
-  lcd.print( "IAMBINO  " );
+  lcd.setCursor(0, 0);
+  lcd.print("IAMBINO  ");
   lcd_append_wpm();
 }
 
 void lcd_show_play() {
   lcd.setCursor( 0, 0 );
-  lcd.print( "PLAY " );
-  lcd.print( message_get_index() );
-  lcd.print( "   " );
+  lcd.print("PLAY ");
+  lcd.print(message_get_index());
+  lcd.print("   ");
   lcd_append_wpm();
 }
 
 void lcd_show_record() {
-  lcd.setCursor( 0, 0 );
-  lcd.print( "REC " );
-  lcd.print( message_get_index() );
-  lcd.print( "    " );
+  lcd.setCursor(0, 0);
+  lcd.print("REC ");
+  lcd.print(message_get_index());
+  lcd.print("    ");
   lcd_append_wpm();
 }
 
@@ -99,13 +99,13 @@ void lcd_append_wpm() {
   if (cfg_get_speed() < 100) lcd.print(" ");
   if (cfg_get_speed() < 10) lcd.print(" ");
   lcd.print(cfg_get_speed(), 0);
-  lcd.print( " WPM" );
+  lcd.print(" WPM");
   lcd_update_pos = 17;
 }
 
 void lcd_show_settings() {
-  lcd.setCursor( 0, 0 );
-  lcd.print( "\001   SETTINGS   \002" );
+  lcd.setCursor(0, 0);
+  lcd.print(F("\001   SETTINGS   \002"));
 }
 
 void lcd_write(uint8_t c) {
@@ -116,7 +116,7 @@ void lcd_write(uint8_t c) {
 
 void lcd_loop() {
   if (lcd_update_pos == 17) {
-    lcd.setCursor( 0, 1 );
+    lcd.setCursor(0, 1);
     lcd_update_pos = 0;
   } else if (lcd_update_pos < 16) {
     lcd.write(lcd_buffer[(lcd_pos+lcd_update_pos)&0x0F]);
@@ -125,35 +125,33 @@ void lcd_loop() {
 }
 
 
-uint8_t cfg_backlight_level;
-
-uint8_t cfg_get_backlight() {
-  return cfg_backlight_level;
-}
-
 void cfg_set_backlight(uint8_t level) {
-  cfg_backlight_level = level;
+  cfg.backlight = level;
   lcd_set_backlight(level);
 }
 
 void cfg_backlight(uint8_t button) {
+  if (button == BUTTON_NONE) {
+    cfg_set_backlight(6);
+    return;
+  }
+  
   button_fast(true);
   
   if (button & BUTTON_UP) {
-    if (cfg_backlight_level < CFG_BACKLIGHT_MAX) {
-      cfg_backlight_level++;
+    if (cfg.backlight < CFG_BACKLIGHT_MAX) {
+      cfg_set_backlight(cfg.backlight+1);
     }
   }
   if (button & BUTTON_DOWN) {
-    if (cfg_backlight_level > 0) {
-      cfg_backlight_level--;
+    if (cfg.backlight > 0) {
+      cfg_set_backlight(cfg.backlight-1);
     }
   }
   
   lcd.setCursor( 0, 1 );
-  lcd.print("BACKLIGHT: ");
-  lcd.print(cfg_backlight_level);
+  lcd.print(F("BACKLIGHT: "));
+  lcd.print(cfg.backlight);
   lcd.print(LCD_CLEAR_8);
-  cfg_set_backlight(cfg_backlight_level);
 }
 

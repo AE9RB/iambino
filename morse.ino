@@ -104,7 +104,6 @@ const prosign PROSIGNS[] = {
   PROSIGN('A', 'A', 1313),
   PROSIGN('A', 'S', 13111),
   PROSIGN('B', 'K', 3111313),
-  PROSIGN('B', 'T', 13331),
   PROSIGN('C', 'T', 31313),
   PROSIGN('D', 'O', 311333),
   PROSIGN('S', 'K', 111313),

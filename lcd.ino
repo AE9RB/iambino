@@ -108,9 +108,15 @@ void lcd_show_settings() {
   lcd.print(F("\001   SETTINGS   \002"));
 }
 
-void lcd_write(uint8_t c) {
-  lcd_buffer[lcd_pos&0x0F] = c;
-  lcd_pos++;
+void lcd_write(uint16_t c) {
+  if (c&0xFF00) {
+    lcd_buffer[lcd_pos++&0x0F] = '{';
+    lcd_buffer[lcd_pos++&0x0F] = c>>8;
+    lcd_buffer[lcd_pos++&0x0F] = c;
+    lcd_buffer[lcd_pos++&0x0F] = '}';
+  } else {
+    lcd_buffer[lcd_pos++&0x0F] = c;
+  }
   lcd_update_pos = 17;
 }
 

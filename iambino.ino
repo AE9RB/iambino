@@ -271,7 +271,7 @@ void cfg_setup() {
   if (button == BUTTON_SELECT) {
     lcd_set_backlight(CFG_BACKLIGHT_MAX);
     lcd.setCursor(0, 0);
-    lcd.print(F("\001 RESET EEPROM \002"));
+    lcd.print(F("\001 ERASE EEPROM \002"));
     for(;;) {
       lcd.setCursor(0, 1);
       switch(selection) {
@@ -293,7 +293,7 @@ void cfg_setup() {
       if (selection < 0) selection = 2;
 
       if (button == BUTTON_SELECT) {
-        if (selection) lcd_set_backlight(0);
+        lcd_set_backlight(0);
         if (selection==2) {
           for (int i=0; i<1024; i++) EEPROM.write(i, 0xFF);
         }

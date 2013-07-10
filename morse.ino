@@ -93,16 +93,30 @@ const uint8_t MCODES[] = {
     /* 0x5A Z */ MCODE(3311),
 };
 
-uint8_t morse_mcode_for(uint8_t c) {
-  if (c >= 0x20 && c < 0x20 + sizeof(MCODES)) {
-    return MCODES[c-0x20];
-  }
-  return 0;
-}
+struct prosign {
+  uint16_t ch;
+  uint8_t  mcode;
+};
 
-uint8_t morse_char_for(uint8_t mcode) {
+#define PROSIGN(a,b,m) {((a)<<8) | (b), MCODE(m) }
+
+const prosign PROSIGNS[] = {
+  PROSIGN('A', 'A', 1313),
+  PROSIGN('A', 'S', 13111),
+  PROSIGN('B', 'K', 3111313),
+  PROSIGN('B', 'T', 13331),
+  PROSIGN('C', 'T', 31313),
+  PROSIGN('D', 'O', 311333),
+  PROSIGN('S', 'K', 111313),
+  PROSIGN('S', 'N', 11131),
+};
+
+uint16_t morse_char_for(uint8_t mcode) {
   for (uint8_t i=0; i < sizeof(MCODES); i++) {
     if (mcode == MCODES[i]) return i + 0x20;
+  }
+  for (uint8_t i=0; i < (sizeof(PROSIGNS)/sizeof(prosign)); i++) {
+    if (mcode == PROSIGNS[i].mcode) return PROSIGNS[i].ch;
   }
   return 0;
 }

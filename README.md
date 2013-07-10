@@ -36,7 +36,7 @@ The Iambino settings and messages are stored in EEPROM. It some cases it may be 
 
 Pressing a black button will play its message contents. Press a button or touch your key to cancel sending.
 
-To program a message, hold a black button down until the LCD says "REC". Use your key to enter a message. Pressing a black button with stop recording and save the message. Use the red button to abort a recording.
+To program a message, hold a black button down until the LCD says "REC". Use your key to enter a message. Seven or more dots will erase the previous word. Pressing a black button with stop recording and save the message. Use the red button to abort a recording.
 
 The red button will enter and exit settings mode. The outer black buttons change the type of setting. The inner black buttons change the value of a setting. You can hold a button down to quickly move through settings or values.
 

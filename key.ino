@@ -65,10 +65,10 @@ void cfg_speed(uint8_t button) {
   
   button_fast(true);
   if (button & BUTTON_UP)
-    if (cfg_speed_wpm < cfg.speed_max)
+    if (cfg_speed_wpm < CFG_SPEED_MAX)
       cfg_set_speed(cfg_speed_wpm + 1);
   if (button & BUTTON_DOWN)
-    if (cfg_speed_wpm > cfg.speed_min)
+    if (cfg_speed_wpm > CFG_SPEED_MIN)
       cfg_set_speed(cfg_speed_wpm - 1);
   
   lcd.setCursor( 0, 1 );

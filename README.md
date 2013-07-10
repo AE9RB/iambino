@@ -24,9 +24,9 @@ Unzip the contents on your hard drive and rename the folder to "iambino". The ZI
 
 Next, use the "Upload" option in the file menu to program the hardware. If you don't get any errors then you can proceed to installing the shield with the power disconnected. If it boots to the LCD saying "IAMBINO" then you are done.
 
-## EEPROM Reset
+## EEPROM Erase
 
-The Iambino settings and messages are stored in EEPROM. It some cases it may be necessary to manually force a reset. Holding the red button down while resetting the device will bring up a reset menu. Use the black buttons to select an option and the red button to execute.
+The Iambino settings and messages are stored in EEPROM. It some cases it may be necessary to perform a manual erasure. Holding the red button down while resetting the device will bring up the EEPROM menu. Use the black buttons to select an option and the red button to execute.
 
  * CANCEL - Do nothing, boot normal.
  * SETTINGS - Erase the settings but not the messages.
@@ -34,5 +34,62 @@ The Iambino settings and messages are stored in EEPROM. It some cases it may be 
  
 ## Basic Operation
 
-...more documentation coming soon...
+Pressing a black button will play its message contents. Press a button or touch your key to cancel sending.
 
+To program a message, hold a black button down until the LCD says "REC". Use your key to enter a message. Pressing a black button with stop recording and save the message. Use the red button to abort a recording.
+
+The red button will enter and exit settings mode. The outer black buttons change the type of setting. The inner black buttons change the value of a setting. You can hold a button down to quickly move through settings or values.
+
+## Settings
+
+#### SPEED
+
+Sending speed may be adjusted in this menu or with the potentiometer.
+
+#### SPEED MIN and MAX
+
+Adjusts the minimum and maximum speed range of the potentiometer.
+
+#### MESSAGE BANK
+
+There are two message banks in the Iambino. This allows you to switch between them so you can store eight messages of up to 111 characters each.
+
+#### MODE
+
+Choose from Iambic, Ultimatic, Bug, or Straight keying. Note that you can not program messages in straight key mode. The bug mode is useful for tuning your antenna when you need to transmit a long tone.
+
+#### MEMORY
+
+Memory type determines if new dots and dashes are looked at before the current element finishes sending. With Type B you send the letter N by pressing dash then dot as fast as you want. With Type A (no memory) you send an N by pressing dash then holding dot until it begins sending. You may also choose to only have memory on either dots or dashes.
+
+#### SPACING
+
+Spacing defines how the keyer will enforce the off time between elements, characters, and words. The character and word settings are useful tools to help you learn better spacing.
+
+#### WEIGHTING
+
+Weighting refers to the balance between the on and off time of a dot. Normally, a series of dots is exactly balanced 50% on and 50% off. If you want a heavier or lighter sound, adjust this to your preference.
+
+#### PADDLE
+
+Normally, a key is wired with the dots(left) on the tip of the plug and dashes(right) on the ring. You can reverse this in software so you don't have to rewire your key or want to share with someone who sends the other direction.
+
+#### TX LAG
+
+Some transmitters have a small delay between the time they are activated and when the transmission actually begins. Use this setting to lengthen the time the transmitter is activated for a elements. This is a constant time added to every element unlike weighting which will adjust based on the sending speed.
+
+#### TONE
+
+Frequency of the sidetone generator. The included speaker is resonant around 1300Hz. It will be significantly quieter at other frequencies. Larger speakers and headphones will have a flatter frequency response.
+
+#### VOLUME
+
+Loudness of the sidetone generator.
+
+#### TX SIDETONE
+
+Determines if the sidetone generator operates during transmissions. You can turn this off to use the sidetone in your transceiver. When off, the sidetone will only play while recording messages.
+
+#### BACKLIGHT
+
+Brightness of the LCD backlight

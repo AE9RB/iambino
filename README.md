@@ -36,7 +36,7 @@ The Iambino settings and messages are stored in EEPROM. It some cases it may be 
 
 Pressing a black button will play its message contents. Press a button or touch your key to cancel sending.
 
-To program a message, hold a black button down until the LCD says "REC". Use your key to enter a message. Seven or more dots will erase the previous word. Pressing a black button with stop recording and save the message. Use the red button to abort a recording.
+To program a message, hold a black button down until the LCD says "REC". Use your key to enter a message. Seven or more dots will erase the previous word. Pressing a black button will stop recording and save the message. Use the red button to abort a recording.
 
 The red button will enter and exit settings mode. The outer black buttons change the type of setting. The inner black buttons change the value of a setting. You can hold a button down to quickly move through settings or values.
 
@@ -76,7 +76,7 @@ Normally, a key is wired with the dots(left) on the tip of the plug and dashes(r
 
 #### TX LAG
 
-Some transmitters have a small delay between the time they are activated and when the transmission actually begins. Use this setting to lengthen the time the transmitter is activated for a elements. This is a constant time added to every element unlike weighting which will adjust based on the sending speed.
+Some transmitters have a small delay between the time they are activated and when the transmission actually begins. Use this setting to lengthen the time the transmitter is activated for elements. This is a constant time added to every element unlike weighting which will adapt based on the sending speed.
 
 #### TONE
 
@@ -88,8 +88,8 @@ Loudness of the sidetone generator.
 
 #### TX SIDETONE
 
-Determines if the sidetone generator operates during transmissions. You can turn this off to use the sidetone in your transceiver. When off, the sidetone will only play while recording messages.
+Determines if the sidetone generator operates during transmissions. You can turn this off to use the sidetone in your transmitter. When off, the sidetone will only play while recording messages.
 
 #### BACKLIGHT
 
-Brightness of the LCD backlight
+Brightness of the LCD backlight.

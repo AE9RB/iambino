@@ -58,11 +58,25 @@
 #define LCD_B5 8
 #define LCD_B6 7
 #define LCD_B7 6
-#define LCD_RS 15
+#define LCD_RS A1
 #define LCD_E  4
 #define LCD_BACKLIGHT 5
 
 // DAC pins for direct hardware access.
+#if defined(__AVR_ATmega32U4__)
+// PIN11
+#define DAC_SDI_DDR  DDRB
+#define DAC_SDI_PORT PORTB
+#define DAC_SDI_BIT  (7)
+// PIN12
+#define DAC_CS_DDR  DDRD
+#define DAC_CS_PORT PORTD
+#define DAC_CS_BIT  (6)
+// PIN13
+#define DAC_SCK_DDR  DDRC
+#define DAC_SCK_PORT PORTC
+#define DAC_SCK_BIT  (7)
+#else /* ATmega328 */
 // PIN11
 #define DAC_SDI_DDR  DDRB
 #define DAC_SDI_PORT PORTB
@@ -75,6 +89,8 @@
 #define DAC_SCK_DDR  DDRB
 #define DAC_SCK_PORT PORTB
 #define DAC_SCK_BIT  (5)
+#endif
+
 
 // Share lcd object across entire app
 extern LiquidCrystal lcd;

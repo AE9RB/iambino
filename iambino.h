@@ -51,7 +51,7 @@
 #define KEY_1 2
 
 // Transmit pin
-#define TX_PIN 14
+#define TX_PIN A0
 
 // LCD pins
 #define LCD_B4 9

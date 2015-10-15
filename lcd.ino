@@ -16,7 +16,7 @@
 
 LiquidCrystal lcd( LCD_RS, LCD_E, LCD_B4, LCD_B5, LCD_B6, LCD_B7 );
 
-const char lcd_box[] PROGMEM = {
+const char PROGMEM lcd_box[] PROGMEM = {
   0b11111,
   0b11111,
   0b11111,
@@ -26,7 +26,7 @@ const char lcd_box[] PROGMEM = {
   0b11111,
 };
 
-const char lcd_left_arrow[] PROGMEM = {
+const char PROGMEM lcd_left_arrow[] PROGMEM = {
   0b00010,
   0b00110,
   0b01110,
@@ -36,7 +36,7 @@ const char lcd_left_arrow[] PROGMEM = {
   0b00010,
 };
 
-const char lcd_right_arrow[] PROGMEM = {
+const char PROGMEM lcd_right_arrow[] PROGMEM = {
   0b01000,
   0b01100,
   0b01110,
@@ -46,7 +46,7 @@ const char lcd_right_arrow[] PROGMEM = {
   0b01000,
 };
 
-void lcd_create_char(uint8_t location, const char charmap[]) {
+void lcd_create_char(uint8_t location, const char PROGMEM charmap[]) {
   uint8_t buffer[8];
   buffer[7] = 0;
   memcpy_P(buffer, charmap, 7);

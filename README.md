@@ -1,6 +1,6 @@
 # Iambino - Iambic Keyer for Arduino
 
-Coming soon from http://AE9RB.com/
+Kits available from http://AE9RB.com/
 
 ## Requirements
 

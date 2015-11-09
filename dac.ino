@@ -163,11 +163,13 @@ void dac_setup(void) {
   TIMSK1 |= _BV(OCIE1A);
 }
 
+inline void dac_sck_pulse() __attribute__((always_inline));
 inline void dac_sck_pulse() {
   sbi(DAC_SCK_PORT, DAC_SCK_BIT);
   cbi(DAC_SCK_PORT, DAC_SCK_BIT);
 }
 
+inline void dac_sdi_send(uint8_t, uint8_t) __attribute__((always_inline));
 inline void dac_sdi_send(uint8_t data, uint8_t bit) {
   if(data & _BV(bit)) sbi(DAC_SDI_PORT, DAC_SDI_BIT);
   else cbi(DAC_SDI_PORT, DAC_SDI_BIT);

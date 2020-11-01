@@ -1,5 +1,7 @@
 # Iambino - Iambic Keyer for Arduino
 
+Download [PDF Manual with Schematic](https://github.com/AE9RB/iambino/raw/master/manual.pdf)
+
 ## Requirements
 
 Iambino will only run on Arduino hardware containing an ATmega328 or ATmega32u. The Uno, Leonardo, and later models of the Duemilanove are compatible. This is the most common type of Arduino so you should not have trouble finding one.
